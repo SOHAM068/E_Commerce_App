@@ -179,6 +179,6 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     marginLeft: "auto",
     marginRight: "auto",
-    padding: 15,
+    padding: 16,
   },
 });
