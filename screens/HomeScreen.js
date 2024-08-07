@@ -1,11 +1,28 @@
-import { StyleSheet, Text, View, SafeAreaView, Platform, ScrollView, Pressable, TextInput, Image} from 'react-native'
-import React from 'react'
-import AntDesign from '@expo/vector-icons/AntDesign';
-import Feather from '@expo/vector-icons/Feather';
-import Ionicons from '@expo/vector-icons/Ionicons';
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import {
+  StyleSheet,
+  Text,
+  View,
+  SafeAreaView,
+  Platform,
+  ScrollView,
+  Pressable,
+  TextInput,
+  Image,
+  Dimensions,
+} from "react-native";
+import React, { useState, useEffect } from "react";
+import AntDesign from "@expo/vector-icons/AntDesign";
+import Feather from "@expo/vector-icons/Feather";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import Carousel from "react-native-reanimated-carousel";
+import axios from "axios";
+import ProductItem from "../components/ProductItem";
 
 const HomeScreen = () => {
+  const screenWidth = Dimensions.get("window").width;
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [products, setProducts] = useState([]);
   const list = [
     {
       id: "0",
@@ -117,7 +134,7 @@ const HomeScreen = () => {
       id: "0",
       title:
         "Oppo Enco Air3 Pro True Wireless in Ear Earbuds with Industry First Composite Bamboo Fiber, 49dB ANC, 30H Playtime, 47ms Ultra Low Latency,Fast Charge,BT 5.3 (Green)",
-      offer: "72% off",
+      offer: "72%",
       oldPrice: 7500,
       price: 4500,
       image:
@@ -175,12 +192,48 @@ const HomeScreen = () => {
       size: "8GB RAM, 128GB Storage",
     },
   ];
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get("https://fakestoreapi.com/products");
+        setProducts(response.data);
+      } catch (err) {
+        console.log("Error message : ", err);
+      }
+    };
+    fetchData();
+  }, []);
+  // console.log("Products : ",products);
+
+  const renderDot = (_, index) => {
+    return (
+      <View
+        key={index}
+        style={[
+          styles.dot,
+          { backgroundColor: index === currentIndex ? "#000" : "#ccc" },
+        ]}
+      />
+    );
+  };
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
-        <View style={{backgroundColor:'#00CED1', padding:10, flexDirection: 'row', alignItems:'center'}}>
+        <View
+          style={{
+            backgroundColor: "#00CED1",
+            padding: 10,
+            flexDirection: "row",
+            alignItems: "center",
+          }}
+        >
           <Pressable style={styles.pressable1}>
-            <AntDesign style={{paddingLeft:10}} name="search1" size={22} color="black" />
+            <AntDesign
+              style={{ paddingLeft: 10 }}
+              name="search1"
+              size={22}
+              color="black"
+            />
             <TextInput placeholder="Search amazon.in" />
           </Pressable>
           <Feather name="mic" size={24} color="black" />
@@ -189,7 +242,9 @@ const HomeScreen = () => {
         <View style={styles.locationContainer}>
           <Ionicons name="location-outline" size={24} color="black" />
           <Pressable>
-            <Text style={{fontSize:13.5, fontWeight:'500'}}>Deliver to Soham - Gwalior 474002</Text>
+            <Text style={{ fontSize: 13.5, fontWeight: "500" }}>
+              Deliver to Soham - Gwalior 474002
+            </Text>
           </Pressable>
           <MaterialIcons name="keyboard-arrow-down" size={24} color="black" />
         </View>
@@ -197,49 +252,192 @@ const HomeScreen = () => {
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           {list.map((item, index) => (
             <Pressable key={index} style={styles.listContainer}>
-              <Image 
-                style={{width: 55, height: 55, resizeMode:'contain'}}
-                source={{uri: item.image}} />
-              <Text style={{textAlign:'center', fontSize:12, fontWeight:'500', marginTop: 5}}>{item?.name}</Text>
+              <Image
+                style={{ width: 55, height: 55, resizeMode: "contain" }}
+                source={{ uri: item.image }}
+              />
+              <Text
+                style={{
+                  textAlign: "center",
+                  fontSize: 12,
+                  fontWeight: "500",
+                  marginTop: 5,
+                }}
+              >
+                {item?.name}
+              </Text>
             </Pressable>
           ))}
         </ScrollView>
 
-        
+        <View style={{ flex: 1, alignItems: "center" }}>
+          <View style={styles.carouselContainer}>
+            <Carousel
+              width={screenWidth}
+              height={200}
+              data={images}
+              renderItem={({ item }) => (
+                <Image
+                  source={{ uri: item }}
+                  style={{ width: screenWidth, height: 200 }}
+                />
+              )}
+              onSnapToItem={(index) => setCurrentIndex(index)}
+              autoPlay
+              autoPlayInterval={3000}
+              scrollAnimationDuration={600}
+            />
+            <View style={styles.dotContainer}>{images.map(renderDot)}</View>
+          </View>
+        </View>
 
+        <Text style={{ padding: 10, fontSize: 18, fontWeight: "bold" }}>
+          Trending deals of the weak
+        </Text>
+
+        <View
+          style={{
+            flexDirection: "row",
+            flexWrap: "wrap",
+            alignItems: "center",
+          }}
+        >
+          {deals.map((item, index) => (
+            <Pressable key={index}>
+              <Image style={styles.dealsImage} source={{ uri: item.image }} />
+            </Pressable>
+          ))}
+        </View>
+
+        <View
+          style={{
+            borderWidth: 2,
+            borderColor: "#D0D0D0",
+            height: 1,
+            marginTop: 15,
+          }}
+        />
+
+        <Text style={{ padding: 10, fontSize: 18, fontWeight: "bold" }}>
+          Today's Deal
+        </Text>
+
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          {offers.map((item, index) => (
+            <Pressable key={index} style={styles.offerPressable}>
+              <Image style={styles.offerImage} source={{ uri: item?.image }} />
+
+              <View style={styles.offerView}>
+                <Text style={styles.offerText}>Upto {item?.offer} Off</Text>
+              </View>
+            </Pressable>
+          ))}
+        </ScrollView>
+
+        <View
+          style={{
+            borderWidth: 2,
+            borderColor: "#D0D0D0",
+            height: 1,
+            marginTop: 15,
+          }}
+        />
+
+        <View style={{flexDirection:'row', flexWrap:'wrap', alignItems:'center'}}>
+          {products.map((item, index) => (
+            <ProductItem item={item} key={index} />
+          ))}
+        </View>
       </ScrollView>
     </SafeAreaView>
-  )
-}
+  );
+};
 
-export default HomeScreen
+export default HomeScreen;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: Platform.OS === "android" ? 40 : 0,
-    backgroundColor: 'white',
+    backgroundColor: "white",
   },
-  pressable1:{
-    flexDirection: 'row',
-    alignItems: 'center',
+  pressable1: {
+    flexDirection: "row",
+    alignItems: "center",
     marginHorizontal: 7,
-    gap:10,
-    backgroundColor: 'white',
-    borderRadius:3,
+    gap: 10,
+    backgroundColor: "white",
+    borderRadius: 3,
     height: 38,
-    flex: 1
+    flex: 1,
   },
-  locationContainer:{
-    flexDirection: 'row',
-    alignItems: 'center',
+  locationContainer: {
+    flexDirection: "row",
+    alignItems: "center",
     padding: 10,
     backgroundColor: "#AFEEEE",
-    gap: 5
+    gap: 5,
   },
-  listContainer:{
+  listContainer: {
     margin: 10,
-    alignItems: 'center',
-    justifyContent: 'center'
-  }
-})
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  carouselItem: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  carouselImage: {
+    width: "100%",
+    height: "100%",
+    resizeMode: "contain",
+  },
+  dotContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    position: "absolute",
+    bottom: 10,
+    left: 0,
+    right: 0,
+  },
+  dot: {
+    width: 10,
+    height: 10,
+    borderRadius: 4,
+    marginHorizontal: 4,
+  },
+  carouselContainer: {
+    position: "relative",
+  },
+  dealsImage: {
+    width: 200,
+    height: 200,
+    resizeMode: "contain",
+  },
+  offerImage: {
+    width: 150,
+    height: 150,
+    resizeMode: "contain",
+  },
+  offerPressable: {
+    marginVertical: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  offerView: {
+    backgroundColor: "#E31837",
+    paddingVertical: 5,
+    width: 130,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 10,
+    borderRadius: 4,
+  },
+  offerText: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 13,
+    textAlign: "center",
+  },
+});
