@@ -10,7 +10,7 @@ import {
   Image,
   Dimensions,
 } from "react-native";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext, useCallback } from "react";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Feather from "@expo/vector-icons/Feather";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -18,11 +18,26 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import Carousel from "react-native-reanimated-carousel";
 import axios from "axios";
 import ProductItem from "../components/ProductItem";
+import DropDownPicker from "react-native-dropdown-picker";
+import { useNavigation } from "expo-router";
 
 const HomeScreen = () => {
   const screenWidth = Dimensions.get("window").width;
+  const navigation = useNavigation();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [products, setProducts] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [addresses, setAddresses] = useState([]);
+  const [category, setCategory] = useState("men's clothing");
+  // const { userId, setUserId } = useContext(UserType);
+  const [selectedAddress, setSelectedAdress] = useState("");
+  console.log(selectedAddress);
+  const [items, setItems] = useState([
+    { label: "Men's clothing", value: "men's clothing" },
+    { label: "jewelery", value: "jewelery" },
+    { label: "electronics", value: "electronics" },
+    { label: "women's clothing", value: "women's clothing" },
+  ]);
   const list = [
     {
       id: "0",
@@ -203,6 +218,9 @@ const HomeScreen = () => {
     };
     fetchData();
   }, []);
+  const onGenderOpen = useCallback(() => {
+    setCompanyOpen(false);
+  }, []);
   // console.log("Products : ",products);
 
   const renderDot = (_, index) => {
@@ -324,7 +342,20 @@ const HomeScreen = () => {
 
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           {offers.map((item, index) => (
-            <Pressable key={index} style={styles.offerPressable}>
+            <Pressable 
+              onPress={() => navigation.navigate("Info", {
+                id : item.id,
+                title : item.title,
+                price : item?.price,
+                carouselImages : item.carouselImages,
+                color : item.color,
+                size : item.size,
+                oldPrice : item.oldPrice,
+                item : item
+              })} 
+              key={index} 
+              style={styles.offerPressable}
+            >
               <Image style={styles.offerImage} source={{ uri: item?.image }} />
 
               <View style={styles.offerView}>
@@ -343,10 +374,46 @@ const HomeScreen = () => {
           }}
         />
 
-        <View style={{flexDirection:'row', flexWrap:'wrap', alignItems:'center'}}>
-          {products.map((item, index) => (
-            <ProductItem item={item} key={index} />
-          ))}
+        <View
+          style={{
+            marginHorizontal: 10,
+            width: "45%",
+            marginTop: 20,
+            marginBottom: open ? 50 : 15,
+          }}
+        >
+          <DropDownPicker
+            style={{
+              borderColor: "#B7B7B7",
+              height: 30,
+              marginBottom: open ? 120 : 15,
+            }}
+            open={open}
+            value={category}
+            items={items}
+            setOpen={setOpen}
+            setValue={setCategory}
+            setItems={setItems}
+            placeholder="Choose Category"
+            placeholderStyle={styles.dropDownPlaceholder}
+            onOpen={onGenderOpen}
+            zIndex={3000}
+            zIndexInverse={1000}
+          />
+        </View>
+
+        <View
+          style={{
+            flexDirection: "row",
+            flexWrap: "wrap",
+            alignItems: "center",
+          }}
+        >
+          {products
+            ?.filter((item) => item.category === category)
+            .map((item, index) => (
+              <ProductItem item={item} key={index} />
+            ))}
         </View>
       </ScrollView>
     </SafeAreaView>
