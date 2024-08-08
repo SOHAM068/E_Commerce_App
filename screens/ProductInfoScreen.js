@@ -57,7 +57,7 @@ const ProductInfoScreen = () => {
               <View
                 style={[
                   styles.BGImage,
-                  { backgroundColor: "#E0E0E0", marginTop: 8 },
+                  { backgroundColor: "#E0E0E0", marginTop: 9 },
                 ]}
               >
                 <MaterialCommunityIcons
