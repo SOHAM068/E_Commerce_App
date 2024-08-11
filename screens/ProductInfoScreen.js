@@ -6,7 +6,7 @@ import {
   TextInput,
   View,
 } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import { Pressable } from "react-native";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Feather from "@expo/vector-icons/Feather";
@@ -14,12 +14,28 @@ import { useRoute } from "@react-navigation/native";
 import { ImageBackground } from "react-native";
 import { useNavigation } from "expo-router";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { useDispatch, useSelector } from "react-redux";
+import { addToCart } from "../redux/CartReducer";
 
 const ProductInfoScreen = () => {
   const route = useRoute();
   const { width } = Dimensions.get("window");
   const height = (width * 100) / 100;
   const navigation = useNavigation();
+  const [addedToCart, setAddedToCart] = useState(false);
+
+  const dispatch = useDispatch();
+  const addItemToCart = (item) => {
+    setAddedToCart(true);
+    dispatch(addToCart(item));
+    setTimeout(() => {
+      setAddedToCart(false);
+    }, 600000);
+  };
+
+  const cart = useSelector((state) => state.cart.cart);
+  console.log("Cart : ", cart);
   return (
     <ScrollView style={{ flex: 1, backgroundColor: "white" }}>
       <View
@@ -86,11 +102,11 @@ const ProductInfoScreen = () => {
       </ScrollView>
 
       <View style={{ padding: 10 }}>
-        <Text style={{ fontSize: 15, fontWeight: "500" , color:'grey'}}>
+        <Text style={{ fontSize: 15, fontWeight: "500", color: "grey" }}>
           {route?.params?.title}
         </Text>
 
-        <Text style={{ fontSize: 18, fontWeight: "600", marginTop: 6 }}> 
+        <Text style={{ fontSize: 18, fontWeight: "600", marginTop: 6 }}>
           ₹{route?.params?.price}
         </Text>
       </View>
@@ -120,7 +136,55 @@ const ProductInfoScreen = () => {
         <Text style={{ color: "#00CED1" }}>
           FREE delivery Tomorrow by 3 PM.Order within 10hrs 30 mins
         </Text>
+
+        <View
+          style={{
+            flexDirection: "row",
+            marginVertical: 5,
+            alignItems: "center",
+            gap: 5,
+          }}
+        >
+          <Ionicons name="location" size={24} color="black" />
+
+          <Text style={{ fontSize: 15, fontWeight: "500" }}>
+            Deliver to Soham - Gwalior 474002
+          </Text>
+        </View>
       </View>
+
+      <Text style={{ color: "green", marginHorizontal: 10, fontWeight: "500" }}>
+        IN Stock
+      </Text>
+
+      <Pressable
+        onPress={() => addItemToCart(route.params.item)}
+        style={{
+          backgroundColor: "#FFC72C",
+          padding: 10,
+          borderRadius: 20,
+          justifyContent: "center",
+          alignItems: "center",
+          marginHorizontal: 10,
+          marginVertical: 10,
+        }}
+      >
+        {addedToCart ? <Text>Added to Cart</Text> : <Text>Add to Cart</Text>}
+      </Pressable>
+
+      <Pressable
+        style={{
+          backgroundColor: "#FFAC1C",
+          padding: 10,
+          borderRadius: 20,
+          justifyContent: "center",
+          alignItems: "center",
+          marginHorizontal: 10,
+          marginVertical: 10,
+        }}
+      >
+        <Text>Buy Now</Text>
+      </Pressable>
     </ScrollView>
   );
 };
