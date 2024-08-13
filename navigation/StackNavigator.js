@@ -6,14 +6,14 @@ import LoginScreen from "../screens/LoginScreen";
 import RegisterScreen from "../screens/RegisterScreen";
 import HomeScreen from "../screens/HomeScreen";
 import ProfileScreen from "../screens/ProfileScreen";
-import {
-  createBottomTabNavigator,
-} from "@react-navigation/bottom-tabs";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Entypo from "@expo/vector-icons/Entypo";
-import AntDesign from '@expo/vector-icons/AntDesign';
-import Ionicons from '@expo/vector-icons/Ionicons';
+import AntDesign from "@expo/vector-icons/AntDesign";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import CartScreen from "../screens/CartScreen";
 import ProductInfoScreen from "../screens/ProductInfoScreen";
+import AddAddressScreen from "../screens/AddAddressScreen";
+import AddressScreen from "../screens/AddressScreen";
 
 const StackNavigator = () => {
   const Stack = createNativeStackNavigator();
@@ -46,7 +46,7 @@ const StackNavigator = () => {
             headerShown: false,
             tabBarIcon: ({ focused }) =>
               focused ? (
-                <Ionicons name="person" size={24} color="#008E97" /> 
+                <Ionicons name="person" size={24} color="#008E97" />
               ) : (
                 <Ionicons name="person-outline" size={24} color="black" />
               ),
@@ -92,6 +92,21 @@ const StackNavigator = () => {
         <Stack.Screen
           name="Info"
           component={ProductInfoScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Address"
+          component={AddAddressScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Add"
+          component={AddressScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Cart"
+          component={CartScreen}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

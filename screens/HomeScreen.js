@@ -23,6 +23,9 @@ import { useNavigation } from "expo-router";
 import { useSelector } from "react-redux";
 import { BottomModal, ModalContent, SlideAnimation } from "react-native-modals";
 import Entypo from "@expo/vector-icons/Entypo";
+import { UserType } from "../UserContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import jwt_decode from "jwt-decode";
 
 const HomeScreen = () => {
   const screenWidth = Dimensions.get("window").width;
@@ -32,8 +35,9 @@ const HomeScreen = () => {
   const [open, setOpen] = useState(false);
   const [addresses, setAddresses] = useState([]);
   const [category, setCategory] = useState("men's clothing");
-  // const { userId, setUserId } = useContext(UserType);
-  const [selectedAddress, setSelectedAdress] = useState("");
+  const { userId, setUserId } = useContext(UserType);
+  const [selectedAddress, setSelectedAddress] = useState("");
+
   // console.log(selectedAddress);
   const [items, setItems] = useState([
     { label: "Men's clothing", value: "men's clothing" },
@@ -221,6 +225,7 @@ const HomeScreen = () => {
     };
     fetchData();
   }, []);
+
   const onGenderOpen = useCallback(() => {
     setCompanyOpen(false);
   }, []);
@@ -240,6 +245,35 @@ const HomeScreen = () => {
 
   const cart = useSelector((state) => state.cart.cart);
   const [modalVisible, setModalVisible] = useState(false);
+
+  useEffect(() => {
+    if (userId) {
+      fetchAddresses();
+    }
+  }, [userId, modalVisible]);
+  const fetchAddresses = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:8000/addresses/${userId}`
+      );
+      const { addresses } = response.data;
+
+      setAddresses(addresses);
+    } catch (err) {
+      console.log("Error :", err);
+    }
+  };
+  useEffect(() => {
+    const fetchUser = async () => {
+      const token = await AsyncStorage.getItem("authToken");
+      const decodedToken = jwt_decode(token);
+      const userId = decodedToken.userId;
+      setUserId(userId);
+    };
+
+    fetchUser();
+  }, []);
+  // console.log("addresses", addresses);
   return (
     <>
       <SafeAreaView style={styles.container}>
@@ -270,14 +304,16 @@ const HomeScreen = () => {
               style={styles.modalLocationContainer}
             >
               <Ionicons name="location-outline" size={24} color="black" />
-              <Text style={{ fontSize: 13.5, fontWeight: "500" }}>
-                Deliver to Soham - Gwalior 474002
-              </Text>
-              <MaterialIcons
-                name="keyboard-arrow-down"
-                size={24}
-                color="black"
-              />
+              {selectedAddress ? (
+                <Text>
+                  Deliver to {selectedAddress?.name} - {selectedAddress?.street}
+                </Text>
+              ) : (
+                <Text style={{ fontSize: 13, fontWeight: "500" }}>
+                  Select Delivery Location
+                </Text>
+              )}
+              <MaterialIcons name="keyboard-arrow-down" size={24} color="black" />
             </Pressable>
           </View>
 
@@ -470,8 +506,71 @@ const HomeScreen = () => {
             </Text>
 
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              {/* already added addresses */}
+              {addresses?.map((item, index) => (
+                <Pressable
+                  onPress={() => [
+                    setSelectedAddress(item),
+                    setModalVisible(false),
+                  ]}
+                  style={{
+                    width: 140,
+                    height: 140,
+                    borderColor: "#D0D0D0",
+                    borderWidth: 1,
+                    padding: 10,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    gap: 3,
+                    marginRight: 15,
+                    marginTop: 10,
+                    backgroundColor:
+                      selectedAddress === item ? "#FBCEB1" : "white",
+                  }}
+                >
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 3,
+                    }}
+                  >
+                    <Text style={{ fontSize: 13, fontWeight: "bold" }}>
+                      {item?.name}
+                    </Text>
+                    <Entypo name="location-pin" size={24} color="red" />
+                  </View>
+
+                  <Text
+                    numberOfLines={1}
+                    style={{ width: 130, fontSize: 13, textAlign: "center" }}
+                  >
+                    {item?.houseNo},{item?.landmark}
+                  </Text>
+
+                  <Text
+                    numberOfLines={1}
+                    style={{ width: 130, fontSize: 13, textAlign: "center" }}
+                  >
+                    {item?.street}
+                  </Text>
+                  <Text
+                    numberOfLines={1}
+                    style={{ width: 130, fontSize: 13, textAlign: "center" }}
+                  >
+                    India, Bangalore
+                  </Text>
+                </Pressable>
+              ))}
+
               {/* Already added address */}
-              <Pressable style={styles.modalAddAnAddress}>
+              <Pressable
+                onPress={() => {
+                  setModalVisible(false);
+                  navigation.navigate("Address");
+                }}
+                style={styles.modalAddAnAddress}
+              >
                 <Text
                   style={{
                     textAlign: "center",
@@ -486,22 +585,38 @@ const HomeScreen = () => {
 
             <View style={{ flexDirection: "column", gap: 7, marginBottom: 30 }}>
               <View
-                style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
+                style={{ flexDirection: "row", alignItems: "center", gap: 3 }}
               >
-                <Entypo name="location-pin" size={24} color="black" />
-                <Text style={{fontWeight:'400', color:"#0066b2"}}>Enter an Indian Pincode</Text>
+                <Entypo name="location-pin" size={24} color="#0066b2" />
+                <Text style={{ fontWeight: "400", color: "#0066b2" }}>
+                  Enter an Indian Pincode
+                </Text>
               </View>
               <View
-                style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 5,
+                  marginLeft: 2,
+                }}
               >
-                <Ionicons name="locate-sharp" size={24} color="black" />
-                <Text style={{fontWeight:'400', color:"#0066b2"}}>Use my current location</Text>
+                <Ionicons name="locate-sharp" size={20} color="#0066b2" />
+                <Text style={{ fontWeight: "400", color: "#0066b2" }}>
+                  Use my current location
+                </Text>
               </View>
               <View
-                style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 5,
+                  marginLeft: 3.5,
+                }}
               >
-                <AntDesign name="earth" size={24} color="black" />
-                <Text style={{fontWeight:'400', color:"#0066b2"}}>Deliver outside of India</Text>
+                <AntDesign name="earth" size={18} color="#0066b2" />
+                <Text style={{ fontWeight: "400", color: "#0066b2" }}>
+                  Deliver outside of India
+                </Text>
               </View>
             </View>
           </View>
@@ -611,6 +726,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: 10,
-    marginBottom:10
+    marginBottom: 10,
   },
 });

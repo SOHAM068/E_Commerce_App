@@ -3,13 +3,16 @@ import StackNavigator from "../navigation/StackNavigator";
 import { Provider } from "react-redux";
 import store from "../store";
 import Modal, { ModalPortal } from 'react-native-modals';
+import { UserContext } from "../UserContext";
 
 export default function HomeScreen() {
   return (
     <>
       <Provider store={store}>
-        <StackNavigator />
-        <ModalPortal />
+        <UserContext>
+          <StackNavigator />
+          <ModalPortal />
+        </UserContext>
       </Provider>
     </>
   )
