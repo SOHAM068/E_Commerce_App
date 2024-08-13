@@ -313,7 +313,11 @@ const HomeScreen = () => {
                   Select Delivery Location
                 </Text>
               )}
-              <MaterialIcons name="keyboard-arrow-down" size={24} color="black" />
+              <MaterialIcons
+                name="keyboard-arrow-down"
+                size={24}
+                color="black"
+              />
             </Pressable>
           </View>
 
@@ -511,8 +515,11 @@ const HomeScreen = () => {
                 <Pressable
                   onPress={() => [
                     setSelectedAddress(item),
-                    setModalVisible(false),
+                    setTimeout(() => {
+                      setModalVisible(false);
+                    }, 800),
                   ]}
+                  key={index}
                   style={{
                     width: 140,
                     height: 140,
