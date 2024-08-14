@@ -8,10 +8,11 @@ import {
 } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { UserType } from "../UserContext";
-import axios from "axios";
+import axios, { Axios } from "axios";
 import { Entypo, FontAwesome5, MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "expo-router";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { cleanCart } from "../redux/CartReducer";
 
 const ConfirmationScreen = () => {
   const steps = [
@@ -20,12 +21,14 @@ const ConfirmationScreen = () => {
     { title: "Payment", content: "Payment Detials" },
     { title: "Place Order", content: "Order Summary" },
   ];
+  console.clear();
   const [currentStep, setCurrentStep] = useState(0);
   const [addresses, setAddresses] = useState([]);
   const { userId, setUserId } = useContext(UserType);
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [option, setOption] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
+
   useEffect(() => {
     fetchAddresses();
   }, []);
@@ -46,9 +49,36 @@ const ConfirmationScreen = () => {
   const cart = useSelector((state) => state.cart.cart);
   // console.log(cart);
   const navigation = useNavigation();
+  const dispatch = useDispatch();
   const total = cart
     ?.map((item) => item.price * item.quantity)
     .reduce((curr, prev) => curr + prev, 0);
+
+  const handlePlaceOrder = async () => {
+    try {
+      const orderData = {
+        userId: userId,
+        cartItems: cart,
+        totalPrice: total,
+        shippingAddress: selectedAddress,
+        paymentMethod: selectedOption,
+      };
+
+      const response = await axios.post(
+        "http://localhost:8000/orders",
+        orderData
+      );
+      if (response.status === 200) {
+        Alert.alert("Order Placed Successfully");
+        navigation.navigate("Order");
+        dispatch(cleanCart());
+      } else {
+        console.log("Error placing order:", response.data);
+      }
+    } catch (err) {
+      console.log("Error placing order:", err);
+    }
+  };
   return (
     <ScrollView style={{ backgroundColor: "white" }}>
       <View style={{ flex: 1, paddingHorizontal: 20, paddingTop: 40 }}>
@@ -498,7 +528,7 @@ const ConfirmationScreen = () => {
           </View>
 
           <Pressable
-            // onPress={handlePlaceOrder}
+            onPress={handlePlaceOrder}
             style={{
               backgroundColor: "#FFC72C",
               padding: 10,

@@ -7,6 +7,7 @@ import RegisterScreen from "../screens/RegisterScreen";
 import HomeScreen from "../screens/HomeScreen";
 import ProfileScreen from "../screens/ProfileScreen";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import Entypo from "@expo/vector-icons/Entypo";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import CartScreen from "../screens/CartScreen";
@@ -44,7 +45,6 @@ const StackNavigator = () => {
           options={{
             tabBarLabel: "Profile",
             tabBarLabelStyle: { color: "#008E97" },
-            headerShown: false,
             tabBarIcon: ({ focused }) =>
               focused ? (
                 <Ionicons name="person" size={24} color="#008E97" />

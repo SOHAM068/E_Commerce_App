@@ -191,7 +191,7 @@ app.get("/addresses/:userId", async (req, res) => {
   }
 });
 
-//endpoint to store all the orders of a particular user
+//endpoint to store all the orders
 app.post("/orders", async (req, res) => {
   try {
     const { userId, cartItems, totalPrice, shippingAddress, paymentMethod } =
@@ -202,17 +202,17 @@ app.post("/orders", async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    //create an array of product objects from the cartItems
+    //create an array of product objects from the cart Items
     const products = cartItems.map((item) => ({
-      name: item.name,
-      price: item.price,
+      name: item?.title,
       quantity: item.quantity,
-      image: item.image,
+      price: item.price,
+      image: item?.image,
     }));
 
-    //create a new order
+    //create a new Order
     const order = new Order({
-      user: user,
+      user: userId,
       products: products,
       totalPrice: totalPrice,
       shippingAddress: shippingAddress,
@@ -221,43 +221,42 @@ app.post("/orders", async (req, res) => {
 
     await order.save();
 
-    res.status(200).json({ message: "Order created Successfully" });
-  } catch (err) {
-    console.log("Error during order creation:", err);
-    res.status(500).json({ message: "Order creation failed" });
+    res.status(200).json({ message: "Order created successfully!" });
+  } catch (error) {
+    console.log("error creating orders", error);
+    res.status(500).json({ message: "Error creating orders" });
   }
 });
 
-// endpoint to get the user Profile
+//get the user profile
 app.get("/profile/:userId", async (req, res) => {
   try {
     const userId = req.params.userId;
 
     const user = await User.findById(userId);
+
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    res.status(200).json({ userId });
-  } catch (err) {
-    console.log("cannot get the userId : ", err);
+    res.status(200).json({ user });
+  } catch (error) {
     res.status(500).json({ message: "Error retrieving the user profile" });
   }
 });
 
-//endpoint to get all the orders of a particular user
 app.get("/orders/:userId", async (req, res) => {
   try {
     const userId = req.params.userId;
 
-    const orders = await Order.find({ user: userId });
+    const orders = await Order.find({ user: userId }).populate("user");
+
     if (!orders || orders.length === 0) {
-      return res.status(404).json({ message: "No orders found" });
+      return res.status(404).json({ message: "No orders found for this user" });
     }
 
     res.status(200).json({ orders });
-  } catch (err) {
-    console.log("Error during order retrieval:", err);
-    res.status(500).json({ message: "Order retrieval failed" });
+  } catch (error) {
+    res.status(500).json({ message: "Error" });
   }
 });
