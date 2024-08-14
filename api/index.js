@@ -190,3 +190,74 @@ app.get("/addresses/:userId", async (req, res) => {
     res.status(500).json({ message: "Error retrieveing the addresses" });
   }
 });
+
+//endpoint to store all the orders of a particular user
+app.post("/orders", async (req, res) => {
+  try {
+    const { userId, cartItems, totalPrice, shippingAddress, paymentMethod } =
+      req.body;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    //create an array of product objects from the cartItems
+    const products = cartItems.map((item) => ({
+      name: item.name,
+      price: item.price,
+      quantity: item.quantity,
+      image: item.image,
+    }));
+
+    //create a new order
+    const order = new Order({
+      user: user,
+      products: products,
+      totalPrice: totalPrice,
+      shippingAddress: shippingAddress,
+      paymentMethod: paymentMethod,
+    });
+
+    await order.save();
+
+    res.status(200).json({ message: "Order created Successfully" });
+  } catch (err) {
+    console.log("Error during order creation:", err);
+    res.status(500).json({ message: "Order creation failed" });
+  }
+});
+
+// endpoint to get the user Profile
+app.get("/profile/:userId", async (req, res) => {
+  try {
+    const userId = req.params.userId;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({ userId });
+  } catch (err) {
+    console.log("cannot get the userId : ", err);
+    res.status(500).json({ message: "Error retrieving the user profile" });
+  }
+});
+
+//endpoint to get all the orders of a particular user
+app.get("/orders/:userId", async (req, res) => {
+  try {
+    const userId = req.params.userId;
+
+    const orders = await Order.find({ user: userId });
+    if (!orders || orders.length === 0) {
+      return res.status(404).json({ message: "No orders found" });
+    }
+
+    res.status(200).json({ orders });
+  } catch (err) {
+    console.log("Error during order retrieval:", err);
+    res.status(500).json({ message: "Order retrieval failed" });
+  }
+});

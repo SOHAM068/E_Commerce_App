@@ -75,7 +75,9 @@ const CartScreen = () => {
 
       <View style={{ padding: 10, flexDirection: "row", alignItems: "center" }}>
         <Text style={{ fontSize: 18, fontWeight: "400" }}>Subtotal : </Text>
-        <Text style={{ fontSize: 20, fontWeight: "bold" }}>₹{total}</Text>
+        <Text style={{ fontSize: 20, fontWeight: "bold" }}>
+          ₹{total.toFixed(2)}
+        </Text>
       </View>
       <Text style={{ marginHorizontal: 10 }}>EMI details Available</Text>
 
