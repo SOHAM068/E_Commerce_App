@@ -12,11 +12,17 @@ import { AntDesign } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
-import { addToCart, decrementQuantity, removeFromCart } from "../redux/CartReducer";
+import {
+  addToCart,
+  decrementQuantity,
+  removeFromCart,
+} from "../redux/CartReducer";
+import { useNavigation } from "expo-router";
 
 const CartScreen = () => {
   const cart = useSelector((state) => state.cart.cart);
   // console.log(cart);
+  const navigation = useNavigation();
   const total = cart
     ?.map((item) => item.price * item.quantity)
     .reduce((curr, prev) => curr + prev, 0);
@@ -74,6 +80,7 @@ const CartScreen = () => {
       <Text style={{ marginHorizontal: 10 }}>EMI details Available</Text>
 
       <Pressable
+        onPress={() => navigation.navigate("Confirm")}
         style={{
           backgroundColor: "#FFC72C",
           padding: 10,
