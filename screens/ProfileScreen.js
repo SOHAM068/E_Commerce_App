@@ -20,15 +20,22 @@ const ProfileScreen = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
+
   useLayoutEffect(() => {
     navigation.setOptions({
       headerTitle: "",
       headerStyle: {
         backgroundColor: "#00CED1",
+        height: 80, // Adjust the header height
       },
       headerLeft: () => (
         <Image
-          style={{ width: 140, height: 120, resizeMode: "contain" }}
+          style={{
+            width: 240,
+            height: 220,
+            resizeMode: "contain",
+            marginBottom: 30,
+          }}
           source={{
             uri: "https://assets.stickpng.com/thumbs/580b57fcd9996e24bc43c518.png",
           }}
@@ -39,18 +46,20 @@ const ProfileScreen = () => {
           style={{
             flexDirection: "row",
             alignItems: "center",
-            gap: 6,
-            marginRight: 12,
+            gap: 10,
+            marginRight: 19,
+            marginBottom: 4,
           }}
         >
           <Ionicons name="notifications-outline" size={24} color="black" />
-
           <AntDesign name="search1" size={24} color="black" />
         </View>
       ),
     });
   }, []);
+
   const [user, setUser] = useState();
+
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
@@ -66,14 +75,17 @@ const ProfileScreen = () => {
 
     fetchUserProfile();
   }, []);
+
   const logout = () => {
     clearAuthToken();
   };
+
   const clearAuthToken = async () => {
     await AsyncStorage.removeItem("authToken");
     console.log("auth token cleared");
     navigation.replace("Login");
   };
+
   useEffect(() => {
     const fetchOrders = async () => {
       try {
@@ -91,9 +103,16 @@ const ProfileScreen = () => {
 
     fetchOrders();
   }, []);
-  console.log("orders", orders);
+
   return (
-    <>
+    <View style={{ flex: 1 }}>
+      <View
+        style={{
+          height: StatusBar.currentHeight,
+          backgroundColor: "lightblue",
+        }}
+      />
+      <StatusBar backgroundColor="blue" barStyle="dark-content" />
       <ScrollView style={{ padding: 10, flex: 1, backgroundColor: "white" }}>
         <Text style={{ fontSize: 16, fontWeight: "bold" }}>
           Welcome {user?.name}
@@ -180,7 +199,6 @@ const ProfileScreen = () => {
                 }}
                 key={order._id}
               >
-                {/* Render the order information here */}
                 {order.products.slice(0, 1)?.map((product) => (
                   <View style={{ marginVertical: 10 }} key={product._id}>
                     <Image
@@ -196,10 +214,12 @@ const ProfileScreen = () => {
           )}
         </ScrollView>
       </ScrollView>
-    </>
+    </View>
   );
 };
 
 export default ProfileScreen;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  // You can define additional styles here if needed
+});

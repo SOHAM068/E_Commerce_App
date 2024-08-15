@@ -7,20 +7,15 @@ import { UserContext } from "../UserContext";
 
 export default function HomeScreen() {
   return (
-    <>
+    <View style={{ flex: 1 }}>
       <Provider store={store}>
         <UserContext>
           <StackNavigator />
           <ModalPortal />
         </UserContext>
       </Provider>
-    </>
+    </View>
   )
 };
 const styles = StyleSheet.create({
-  container: {
-    alignItems: "center",
-    flex: 1,
-    justifyContent: "center",
-  },
 });

@@ -20,15 +20,23 @@ import OrderScreen from "../screens/OrderScreen";
 const StackNavigator = () => {
   const Stack = createNativeStackNavigator();
   const Tab = createBottomTabNavigator();
+
   function BottomTabs() {
     return (
-      <Tab.Navigator>
+      <Tab.Navigator
+        screenOptions={{
+          tabBarStyle: {
+            height: 54, // Adjust height here
+            paddingBottom: 6, // Adjust padding here
+          },
+          tabBarLabelStyle: { color: "#008E97" },
+        }}
+      >
         <Tab.Screen
           name="Home"
           component={HomeScreen}
           options={{
             tabBarLabel: "Home",
-            tabBarLabelStyle: { color: "#008E97" },
             headerShown: false,
             tabBarIcon: ({ focused }) =>
               focused ? (
@@ -44,7 +52,6 @@ const StackNavigator = () => {
           component={ProfileScreen}
           options={{
             tabBarLabel: "Profile",
-            tabBarLabelStyle: { color: "#008E97" },
             tabBarIcon: ({ focused }) =>
               focused ? (
                 <Ionicons name="person" size={24} color="#008E97" />
@@ -59,7 +66,6 @@ const StackNavigator = () => {
           component={CartScreen}
           options={{
             tabBarLabel: "Cart",
-            tabBarLabelStyle: { color: "#008E97" },
             headerShown: false,
             tabBarIcon: ({ focused }) =>
               focused ? (
@@ -72,9 +78,19 @@ const StackNavigator = () => {
       </Tab.Navigator>
     );
   }
+
   return (
     <NavigationContainer independent={true}>
-      <Stack.Navigator>
+      <Stack.Navigator
+        screenOptions={{
+          headerStyle: {
+            height: 80, // Adjust header height here
+          },
+          headerTitleStyle: {
+            fontSize: 20, // Optional: Adjust title font size
+          },
+        }}
+      >
         <Stack.Screen
           name="Login"
           component={LoginScreen}
